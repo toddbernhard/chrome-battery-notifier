@@ -1,0 +1,40 @@
+<html>
+<head>
+  <title>Battery Warning settings</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: baseline;
+
+      font-size: 16px;
+    }
+
+    .flex-row {
+      display: flex;
+      flex-direction: row;
+    }
+  </style>
+</head>
+<body>
+  <div class="flex-row">
+      Favorite color:
+    <select id="color">
+     <option value="red">red</option>
+     <option value="green">green</option>
+     <option value="blue">blue</option>
+     <option value="yellow">yellow</option>
+    </select>
+
+    <label>
+      <input type="checkbox" id="like">
+      I like colors.
+    </label>
+
+    <div id="status"></div>
+    <button id="save">Save</button>
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>

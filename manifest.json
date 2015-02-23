@@ -1,0 +1,22 @@
+{
+  "manifest_version": 2,
+  "name": "chrome-battery-warning",
+  "short_name": "chrome-battery-warning",
+  "description": "A configurable notifications from the device's battery",
+  "version": "0.0.1",
+  "minimum_chrome_version": "38",  /* first battery API support */
+
+  "background": {
+    "persistent": false,
+    "scripts": ["jquery-2.1.3.min.js","monitor.js"]
+  },
+  "icons": {
+    "16": "assets/icon_16.png",
+    "128": "assets/icon_128.png"
+  },
+  "permissions": [
+    "notifications",
+    "storage"    /* for settings */
+  ],
+  "options_page": "options.html" /* Chrome ver < 40 */
+}
