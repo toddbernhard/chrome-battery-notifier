@@ -1,32 +1,91 @@
-// Saves options to chrome.storage
-function save_options() {
-  var color = document.getElementById('color').value;
-  var likesColor = document.getElementById('like').checked;
-  chrome.storage.sync.set({
-    favoriteColor: color,
-    likesColor: likesColor
-  }, function() {
-    // Update status to let user know options were saved.
-    var status = document.getElementById('status');
-    status.textContent = 'Options saved.';
-    setTimeout(function() {
-      status.textContent = '';
-    }, 750);
-  });
-}
+$(function() {
 
-// Restores select box and checkbox state using the preferences
-// stored in chrome.storage.
-function restore_options() {
-  // Use default value color = 'red' and likesColor = true.
-  chrome.storage.sync.get({
-    favoriteColor: 'red',
-    likesColor: true
-  }, function(items) {
-    document.getElementById('color').value = items.favoriteColor;
-    document.getElementById('like').checked = items.likesColor;
-  });
-}
-document.addEventListener('DOMContentLoaded', restore_options);
-document.getElementById('save').addEventListener('click',
-    save_options);
+  var $enabled = $('input[name=enabled]'),
+      $allButEnabled = $('.all-but-enabled'),
+      $typeRadios = $('input[name=type]'),
+      $percentArg = $('.percent-arg'),
+      $timeArg = $('.time-arg'),
+      $timeArgAmount = $timeArg.find('input[name=timeArgAmount]'),
+      $timeArgUnit = $timeArg.find('input[name=timeArgUnit]');
+
+  tempOptions = [{},{},{}];
+
+  function loadOptions() {
+    var options;
+    chrome.runtime.getBackgroundPage(function (monitor) {
+      tempOptions = monitor.warnings;
+      updateDom(tempOptions[0]);
+    });
+  }
+
+  function cacheOptions() {
+    var current = {};
+    current.enabled = $enabled.is(':checked');
+    current.trigger = {};
+    if (isTimeType()) {
+      current.trigger.timeAmount = parseInt($timeArgAmount.val());
+      current.trigger.timeUnit = $timeArgUnit.val();
+    } else {
+      current.trigger.percent = parseInt($percentArg.find('input').val());
+    }
+    return current;
+  }
+
+  function saveOptions() {
+    var options = cacheOptions();
+    chrome.storage.local.set({'warnings': [options]});
+    chrome.runtime.getBackgroundPage(function (monitor) {
+      monitor.setOptions([options]);
+      console.log("Options saved.");
+    });
+  }
+
+
+  function updateDom(warning) {
+    var triggerType = (warning.trigger.percent !== null) ? 'percent' : 'time';
+
+    $enabled.prop('checked', warning.enabled);
+    $typeRadios.find('*[value=' + triggerType + ']').prop('checked', true);
+    updateTypeDom(warning);
+    updateEnabledDom();
+  }
+
+  function updateEnabledDom() {
+    if ($enabled.prop('checked')) {
+      $allButEnabled.removeClass('disabled').find('input').prop('disabled', false);
+    } else {
+      $allButEnabled.addClass('disabled').find('input').prop('disabled', true);
+    }
+  }
+
+  function isTimeType() {
+    return $typeRadios.filter('*:checked').val() == 'time';
+  }
+
+  function updateTypeDom(warning) {
+
+    if ( ! isTimeType() ) {
+      $percentArg.show();
+      $timeArg.hide();
+      if (warning) {
+        $percentArg.find('input').val(warning.trigger.percent);
+      }
+    } else {
+      $timeArg.show();
+      $percentArg.hide();
+      if (warning) {
+        $timeArgAmount.val(warning.trigger.timeAmount);
+        $timeArgUnit.val(warning.trigger.timeUnit);
+      }
+    }
+  }
+
+
+  $enabled.on('click', updateEnabledDom);
+
+  $typeRadios.on('click', updateTypeDom);
+
+  $('#save').on('click', saveOptions);
+
+  loadOptions();
+});

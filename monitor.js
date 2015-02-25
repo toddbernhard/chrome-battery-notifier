@@ -46,9 +46,15 @@ function unformatTime(count, unit) {
 /**
  * Triggers
  */
-var Trigger = function(_percent, _time) {
+var Trigger = function(_percent, _timeAmount, _timeUnit) {
   this.percent = _percent || null;
-  this.time = _time || null;  /* time in seconds */
+  if (_timeAmount && _timeUnit) {
+    this.timeAmount = _timeAmount;
+    this.timeUnit = _timeUnit;
+  } else {
+    this.timeAmount = null;
+    this.timeUnit = null;
+  }
 
   return this;
 };
@@ -61,15 +67,27 @@ Trigger.prototype.check = function(battery) {
     }
   }
 
-  if (this.time !== null) {
-    if (this.time === battery.chargingTime ||
-        this.time === battery.dischargingTime) {
+  if (this.time() !== null) {
+    if (this.time() === battery.chargingTime ||
+        this.time() === battery.dischargingTime) {
           return true;
     }
   }
 
   /* otherwise.. */
   return false;
+};
+
+Trigger.prototype.time = function() {
+  if (this.timeAmount !== null && this.timeUnit !== null) {
+    return unformatTime(this.timeAmount, this.timeUnit);
+  } else {
+    return null;
+  }
+}
+
+Trigger.fromJsonObject = function(obj) {
+  return new Trigger(obj.percent, obj.timeAmount, obj.timeUnit);
 };
 
 
@@ -79,27 +97,23 @@ Trigger.prototype.check = function(battery) {
 function Warning(options) {
   options = options || {};
 
-  this.enabled = options.enabled || true; // unsupported
-  this.trigger = options.trigger || new Trigger(43, null);
-  this.name = ""; // unsupported
-  this.whenCharging = false; // unsupported
-  this.whenDischarging = true; // unsupported
+  this.enabled = options.enabled || true;
+  this.trigger = options.trigger || new Trigger(10);
 
   this.shown = false;
-  this.battery = undefined;
 }
 
 Warning.prototype.notificationId = "battery-warning";
 
-Warning.prototype.defaultName = function() {
+Warning.prototype.name = function() {
   var percentText, timeText;
 
   if (this.trigger.percent !== null) {
     percentText = this.trigger.percent + "%";
   }
 
-  if (this.trigger.time !== null) {
-    timeText = formatTime(this.trigger.time);
+  if (this.trigger.time() !== null) {
+    timeText = formatTime(this.trigger.time());
   }
 
   if (percentText && timeText) {
@@ -114,13 +128,14 @@ Warning.prototype.defaultName = function() {
 };
 
 Warning.prototype.checkBattery = function(battery) {
-  this.battery = battery;
 
-  var isTriggered = this.trigger.check(this.battery);
+  var isTriggered = this.trigger.check(battery);
 
+  if (this.enabled) {
+  if (!battery.charging) {
   if (!this.shown && isTriggered) {
-    this.showNotification();
-  }
+    this.showNotification(battery);
+  }}}
 
   this.shown = isTriggered;
 };
@@ -129,18 +144,25 @@ Warning.prototype.updateNotificationId = function(newId) {
   Warning.prototype.notificationId = newId;
 };
 
-Warning.prototype.showNotification = function() {
+Warning.prototype.showNotification = function(battery) {
+  var percentage = Math.floor(battery.level * 100);
+
   chrome.notifications.create(
     this.notificationId,
     {
       type: "progress",
       title: "Battery Warning",
-      message: "battery is " + this.battery.level * 100 + "%",
+      message: "battery is " + percentage + "%",
       iconUrl: "assets/icon_128.png",
-      progress: Math.floor(this.battery.level * 100)
+      progress: percentage
     },
     this.updateNotificationId
   );
+};
+
+Warning.fromJsonObject = function(obj) {
+  obj.trigger = Trigger.fromJsonObject(obj.trigger);
+  return new Warning(obj);
 };
 
 
@@ -148,36 +170,40 @@ var warnings = [
   new Warning({})
 ];
 
-Warning.prototype.listenToBattery = function(battery) {
-  if (this.battery) {
-    stopListening();
-  }
-
-  if (battery) {
-    this.battery = battery;
-
-    if (this.trigger.time !== null) {
-      battery.addEventListener('dischargingtimechange', this.checkBattery);
-    }
-
-    if (this.trigger.percent !== null) {
-      battery.addEventListener('levelchange', this.checkBattery);
-    }
-  }
+var setOptions = function(json) {
+  warnings = json.map(function (obj) {
+    return Warning.fromJsonObject(obj);
+  });
+  console.log("Options set.");
 };
 
-Warning.prototype.stopListening = function() {
-  if (this.battery) {
-    this.battery.removeEventListener('dischargingtimechange', this.checkBattery);
-    this.battery.removeEventListener('levelchange', this.checkBattery);
+function loadFromStorage() {
+  var storeKey = "warnings";
+  try {
+    chrome.storage.local.get(storeKey, function(results) {
+      if (results[storeKey]) {
+        var json = results[storeKey]
+        setOptions(json);
+        console.log(warnings.length + " settings loaded from local storage.");
+      } else {
+        console.log("No settings found.");
+      }
+    });
   }
-};
+  catch (err) {
+    console.log("Error loading settings from local storage:");
+    console.log(err + " " + JSON.stringify(err));
+    return null;
+  }
+}
 
 
 /* See https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API */
 navigator.getBattery().then(function(battery){
 
-  battery.addEventListener('levelchange', function(huh) {
+  loadFromStorage();
+
+  battery.addEventListener('levelchange', function() {
     var battery = this;
     warnings.forEach(function (warning) {
       warning.checkBattery(battery);

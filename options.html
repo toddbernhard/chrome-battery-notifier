@@ -3,38 +3,135 @@
   <title>Battery Warning settings</title>
   <style>
     body {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: baseline;
-
+      padding: .5em;
       font-size: 16px;
     }
 
-    .flex-row {
-      display: flex;
-      flex-direction: row;
+    h3 {
+      margin-top: 1.5em;
+      margin-bottom: 1.9em;
+      text-align: center;
+    }
+
+    div.table {
+      width: 380px;
+    }
+
+    div.row {
+      width: 100%;
+      margin-bottom: .4em;
+    }
+
+    div.row.multirow {
+      margin-bottom: 0;
+    }
+
+    span.label {
+      display: inline-block;
+      width: 50%;
+      text-align: right;
+      padding-right: .8em;
+    }
+
+    span.option {
+      display: inline-block;
+      font-size: .95em;
+    }
+
+    input[type="radio"] {
+      margin-right: .8em;
+    }
+
+    input[type="number"] {
+      width: 3.5em;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    .disabled {
+      opacity: 0.3;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    #save {
+      margin: auto;
+      margin-top: 2.5em;
+    }
+
+    .git-link {
+      display: inline-block;
+      position: fixed;
+      bottom: 1.6em;
+      right: 1.5em;
+      text-decoration: none;
+      opacity: 0.55;
+      color: #000;
+      font-size: .8em;
+    }
+    .git-link:hover {
+      opacity: 1;
+    }
+
+    .git-link img {
+      margin-bottom: -.6em;
+      margin-left: .4em;
+      height: 2em;
     }
   </style>
 </head>
 <body>
-  <div class="flex-row">
-      Favorite color:
-    <select id="color">
-     <option value="red">red</option>
-     <option value="green">green</option>
-     <option value="blue">blue</option>
-     <option value="yellow">yellow</option>
-    </select>
-
-    <label>
-      <input type="checkbox" id="like">
-      I like colors.
-    </label>
-
-    <div id="status"></div>
-    <button id="save">Save</button>
+  <div>
+    <h3>
+      <span class="first-set">&nbsp#1&nbsp</span>
+      <small>\\</small>
+      <span class="second-set"><small><a href>&nbsp2&nbsp</a></small></span>
+      <small>\\</small>
+      <span class="third-set"><small><a href>&nbsp3&nbsp</a></small></span>
+    </h3>
+    <div class="table">
+      <div class="row">
+        <span class="label">Enabled:</span>
+        <span class="option"><input type="checkbox" name="enabled" checked></span>
+      </div>
+      <div class="all-but-enabled">
+        <div class="row multirow">
+          <span class="label">Based on</span>
+          <span class="option"><input type="radio" name="type" value="percent" checked>Percent left</span>
+        </div>
+        <div class="row">
+          <span class="label"></span>
+          <span class="option"><input type="radio" name="type" value="time">Time left</span>
+        </div>
+        <div class="row percent-arg">
+          <span class="label">Show at</span>
+          <span class="option"><input type="number" name="percentArg" min="0" max="100" stepsize="1" value="5" size="3"> %</span>
+        </div>
+        <div class="row time-arg hide">
+          <span class="label">Show at</span>
+          <span class="option">
+            <input type="number" name="timeArgAmount" min="1" max="1000" stepsize="1" value="10" size="4">
+            <select name="timeArgUnit">
+              <option value="seconds">seconds</option>
+              <option value="minutes" selected>minutes</option>
+              <option value="hours">hours</option>
+              <option value="days">days</option>
+            </select>
+          </span>
+        </div>
+      </div>
+      <div class="row center"><button id="save">Save</button></div>
+      <a class="git-link" href="http://github.com/toddbernhard/chrome-battery-warning">
+        <span>feedback + help </span>
+        <img src="assets/github_32.png">
+      </a>
+    </div>
   </div>
+  <script src="jquery-2.1.3.min.js"></script>
   <script src="options.js"></script>
 </body>
 </html>
