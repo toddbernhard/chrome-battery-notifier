@@ -5,4 +5,6 @@ Chrome OS (at least version 41) does not allow users to change the built-in defa
 
 Requires Chrome v.38, which provides an excellent battery API.
 
-Thanks to [P.J. Onori](http://www.somerandomdude.com/) for the icon, found on [iconfinder.com](https://www.iconfinder.com/icons/118734/battery_charging_icon). It is licensed under [Attribution-Non-Commercial 3.0 Netherlands](http://creativecommons.org/licenses/by-nc/3.0/nl/deed.en_GB). Everything else is [MIT](http://en.wikipedia.org/wiki/MIT_License).
+Thanks to [P.J. Onori](http://www.somerandomdude.com/) for the icon, found on [iconfinder.com](https://www.iconfinder.com/icons/118734/battery_charging_icon). It is licensed under [Attribution-Non-Commercial 3.0 Netherlands](http://creativecommons.org/licenses/by-nc/3.0/nl/deed.en_GB).
+The GitHub stuff is, of course, [owned by GitHub](https://github.com/logos).
+Everything else is [MIT](http://en.wikipedia.org/wiki/MIT_License).
