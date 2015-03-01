@@ -1,30 +1,43 @@
 $(function() {
 
-  var $enabled = $('input[name=enabled]'),
+  var $select = $('select'),
+      $allOptions = $('div.table'),
+      $enabled = $('input[name=enabled]'),
       $allButEnabled = $('.all-but-enabled'),
       $typeRadios = $('input[name=type]'),
       $percentArg = $('.percent-arg'),
       $timeArg = $('.time-arg'),
-      $timeArgAmount = $timeArg.find('input[name=timeArgAmount]'),
-      $timeArgUnit = $timeArg.find('input[name=timeArgUnit]');
+      $timeAmount = $timeArg.find('input[name=timeArgAmount]'),
+      $timeUnit = $timeArg.find('input[name=timeArgUnit]'),
+      $save = $('#save');
 
-  tempOptions = [{},{},{}];
+  var defaultOptions = {
+    enabled: false,
+    trigger: {
+      percent: 5,
+      timeUnit: null,
+      timeAmount: null
+    }
+  };
+
+  var tempOptions = [defaultOptions, defaultOptions, defaultOptions],
+      optionIndex = 0;
 
   function loadOptions() {
     var options;
     chrome.runtime.getBackgroundPage(function (monitor) {
       tempOptions = monitor.warnings;
-      updateDom(tempOptions[0]);
+      updateDom(tempOptions[optionIndex]);
     });
   }
 
-  function cacheOptions() {
+  function currentInput() {
     var current = {};
     current.enabled = $enabled.is(':checked');
     current.trigger = {};
     if (isTimeType()) {
-      current.trigger.timeAmount = parseInt($timeArgAmount.val());
-      current.trigger.timeUnit = $timeArgUnit.val();
+      current.trigger.timeAmount = parseInt($timeAmount.val());
+      current.trigger.timeUnit = $timeUnit.val();
     } else {
       current.trigger.percent = parseInt($percentArg.find('input').val());
     }
@@ -32,21 +45,36 @@ $(function() {
   }
 
   function saveOptions() {
-    var options = cacheOptions();
-    chrome.storage.local.set({'warnings': [options]});
+    tempOptions[optionIndex] = currentInput();
+    chrome.storage.local.set({'warnings': tempOptions});
     chrome.runtime.getBackgroundPage(function (monitor) {
-      monitor.setOptions([options]);
+      monitor.setOptions(tempOptions);
       console.log("Options saved.");
+      $save.prop('disabled', true);
     });
   }
 
 
-  function updateDom(warning) {
-    var triggerType = (warning.trigger.percent !== null) ? 'percent' : 'time';
+  function changeSelect() {
+    tempOptions[optionIndex] = currentInput();
+    $allOptions.fadeOut(150, function() {
+      optionIndex = $select.val();
+      updateDom(tempOptions[optionIndex]);
+      $allOptions.fadeIn(400);
+    });
+  }
 
-    $enabled.prop('checked', warning.enabled);
+
+  function updateDom(options) {
+    if (typeof options === "undefined") {
+      options = defaultOptions;
+    }
+
+    var triggerType = (options.trigger.percent !== null) ? 'percent' : 'time';
+
+    $enabled.prop('checked', options.enabled);
     $typeRadios.find('*[value=' + triggerType + ']').prop('checked', true);
-    updateTypeDom(warning);
+    updateTypeDom(options);
     updateEnabledDom();
   }
 
@@ -74,18 +102,43 @@ $(function() {
       $timeArg.show();
       $percentArg.hide();
       if (warning) {
-        $timeArgAmount.val(warning.trigger.timeAmount);
-        $timeArgUnit.val(warning.trigger.timeUnit);
+        $timeAmount.val(warning.trigger.timeAmount);
+        $timeUnit.val(warning.trigger.timeUnit);
       }
     }
   }
 
+  function updateSaveButton() {
+    if (!$save.is(':enabled')) {
+      var current = currentInput(),
+          saved = tempOptions[optionIndex];
+
+      var areSame =
+        current.enabled === saved.enabled &&
+        current.trigger === saved.trigger &&
+        current.trigger.timeAmount === saved.trigger.timeAmount &&
+        current.trigger.timeUnit === saved.trigger.timeUnit &&
+        current.trigger.percent === saved.trigger.percent;
+
+      if (areSame) {
+        $save.prop('disabled', true);
+      } else {
+        $save.prop('disabled', false);
+      }
+    }
+  }
+
+  $select.on('change', changeSelect);
 
   $enabled.on('click', updateEnabledDom);
 
-  $typeRadios.on('click', updateTypeDom);
+  $typeRadios.on('click', function() {
+    updateTypeDom(currentInput());
+  });
 
-  $('#save').on('click', saveOptions);
+  $save.on('click', saveOptions);
+
+  $allOptions.on('click', updateSaveButton);
 
   loadOptions();
 });

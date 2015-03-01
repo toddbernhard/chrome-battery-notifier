@@ -47,7 +47,7 @@ function unformatTime(count, unit) {
  * Triggers
  */
 var Trigger = function(_percent, _timeAmount, _timeUnit) {
-  this.percent = _percent || null;
+  this.percent = _percent ? _percent : null;
   if (_timeAmount && _timeUnit) {
     this.timeAmount = _timeAmount;
     this.timeUnit = _timeUnit;
@@ -97,8 +97,8 @@ Trigger.fromJsonObject = function(obj) {
 function Warning(options) {
   options = options || {};
 
-  this.enabled = options.enabled || true;
-  this.trigger = options.trigger || new Trigger(10);
+  this.enabled = options.enabled ? options.enabled : true;
+  this.trigger = options.trigger ? options.trigger : new Trigger(10);
 
   this.shown = false;
 }
@@ -185,7 +185,7 @@ function loadFromStorage() {
         var json = results[storeKey]
         setOptions(json);
         console.log(warnings.length + " settings loaded from local storage.");
-      } else {
+      }  else {
         console.log("No settings found.");
       }
     });
@@ -205,9 +205,11 @@ navigator.getBattery().then(function(battery){
 
   battery.addEventListener('levelchange', function() {
     var battery = this;
-    warnings.forEach(function (warning) {
+    warnings.forEach(function(warning) {
       warning.checkBattery(battery);
     });
   });
 
+}, function() {
+  console.log("no battery found");
 });
