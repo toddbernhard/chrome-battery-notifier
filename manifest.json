@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Battery Warning",
   "short_name": "Battery Warning",
-  "description": "A configurable notifications from the device's battery",
+  "description": "Configurable notifications based on the device's battery",
   "version": "0.0.1",
   "minimum_chrome_version": "38",  /* first battery API support */
 

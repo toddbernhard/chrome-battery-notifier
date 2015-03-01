@@ -43,11 +43,11 @@ function unformatTime(count, unit) {
 }
 
 
-/**
+/*
  * Triggers
  */
 var Trigger = function(_percent, _timeAmount, _timeUnit) {
-  this.percent = _percent ? _percent : null;
+  this.percent = _percent || null;
   if (_timeAmount && _timeUnit) {
     this.timeAmount = _timeAmount;
     this.timeUnit = _timeUnit;
@@ -97,8 +97,8 @@ Trigger.fromJsonObject = function(obj) {
 function Warning(options) {
   options = options || {};
 
-  this.enabled = options.enabled ? options.enabled : true;
-  this.trigger = options.trigger ? options.trigger : new Trigger(10);
+  this.enabled = ('enabled' in options) ? options.enabled : true;
+  this.trigger = ('trigger' in options) ? options.trigger : new Trigger(10);
 
   this.shown = false;
 }
@@ -150,15 +150,20 @@ Warning.prototype.showNotification = function(battery) {
   chrome.notifications.create(
     this.notificationId,
     {
-      type: "progress",
-      title: "Battery Warning",
-      message: "battery is " + percentage + "%",
-      iconUrl: "assets/icon_128.png",
-      progress: percentage
+      type: "basic",
+      title: percentage + "% power left",
+      message: "",
+      contextMessage: formatTime(battery.dischargingTime) + " remaining",
+      isClickable: false,
+      iconUrl: "assets/icon_128.png"
     },
     this.updateNotificationId
   );
 };
+
+chrome.notifications.onClicked.addListener(function (notificationId) {
+  chrome.notifications.clear(notificationId, function () {});
+});
 
 Warning.fromJsonObject = function(obj) {
   obj.trigger = Trigger.fromJsonObject(obj.trigger);

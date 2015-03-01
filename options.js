@@ -20,14 +20,30 @@ $(function() {
     }
   };
 
-  var tempOptions = [defaultOptions, defaultOptions, defaultOptions],
-      optionIndex = 0;
+  var temp = {
+        options: [defaultOptions, defaultOptions, defaultOptions],
+        index: 0,
+        getOptions: function(index) {
+          index = index || temp.index;
+          if (index < temp.options.length) {
+            return temp.options[index];
+          } else {
+            return defaultOptions;
+          }
+        },
+        set: function(options) {
+          temp.options = options;
+        },
+        setCurrent: function() {
+          temp.options[temp.index] = currentInput();
+        }
+      };
 
   function loadOptions() {
     var options;
     chrome.runtime.getBackgroundPage(function (monitor) {
-      tempOptions = monitor.warnings;
-      updateDom(tempOptions[optionIndex]);
+      temp.set(monitor.warnings);
+      updateDom(temp.getOptions());
     });
   }
 
@@ -45,10 +61,10 @@ $(function() {
   }
 
   function saveOptions() {
-    tempOptions[optionIndex] = currentInput();
-    chrome.storage.local.set({'warnings': tempOptions});
+    temp.setCurrent();
+    chrome.storage.local.set({'warnings': temp.options});
     chrome.runtime.getBackgroundPage(function (monitor) {
-      monitor.setOptions(tempOptions);
+      monitor.setOptions(temp.options);
       console.log("Options saved.");
       $save.prop('disabled', true);
     });
@@ -56,10 +72,10 @@ $(function() {
 
 
   function changeSelect() {
-    tempOptions[optionIndex] = currentInput();
+    temp.setCurrent();
     $allOptions.fadeOut(150, function() {
-      optionIndex = $select.val();
-      updateDom(tempOptions[optionIndex]);
+      temp.index = $select.val();
+      updateDom(temp.getOptions());
       $allOptions.fadeIn(400);
     });
   }
@@ -111,7 +127,7 @@ $(function() {
   function updateSaveButton() {
     if (!$save.is(':enabled')) {
       var current = currentInput(),
-          saved = tempOptions[optionIndex];
+          saved = temp.getOptions();
 
       var areSame =
         current.enabled === saved.enabled &&
