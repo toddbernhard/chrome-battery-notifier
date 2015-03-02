@@ -2,8 +2,8 @@
   "manifest_version": 2,
   "name": "Battery Warning",
   "short_name": "Battery Warning",
-  "description": "Configurable notifications based on the device's battery",
-  "version": "0.0.1",
+  "description": "A small, configurable low battery notifier for Chrome devices",
+  "version": "0.1.0",
   "minimum_chrome_version": "38",
 
   "background": {
@@ -12,6 +12,7 @@
   },
   "icons": {
     "16": "assets/icon_16.png",
+    "48": "assets/icon_48.png",
     "128": "assets/icon_128.png"
   },
   "permissions": [
