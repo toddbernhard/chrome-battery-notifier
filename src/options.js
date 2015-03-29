@@ -1,6 +1,6 @@
 $(function() {
 
-  var $select = $('select'),
+  var $select = $('select.main'),
       $allOptions = $('div.table'),
       $enabled = $('input[name=enabled]'),
       $allButEnabled = $('.all-but-enabled'),
@@ -8,7 +8,7 @@ $(function() {
       $percentArg = $('.percent-arg'),
       $timeArg = $('.time-arg'),
       $timeAmount = $timeArg.find('input[name=timeArgAmount]'),
-      $timeUnit = $timeArg.find('input[name=timeArgUnit]'),
+      $timeUnit = $timeArg.find('select[name=timeArgUnit]'),
       $save = $('#save');
 
   var defaultOptions = {
@@ -31,6 +31,9 @@ $(function() {
             return defaultOptions;
           }
         },
+        getAllOptions: function() {
+          return [temp.getOptions(0), temp.getOptions(1), temp.getOptions(2)];
+        },
         set: function(options) {
           temp.options = options;
         },
@@ -52,19 +55,22 @@ $(function() {
     current.enabled = $enabled.is(':checked');
     current.trigger = {};
     if (isTimeType()) {
+      current.trigger.percent = null;
       current.trigger.timeAmount = parseInt($timeAmount.val());
       current.trigger.timeUnit = $timeUnit.val();
     } else {
       current.trigger.percent = parseInt($percentArg.find('input').val());
+      current.trigger.timeAmount = null;
+      current.trigger.timeUnit = null;
     }
     return current;
   }
 
   function saveOptions() {
     temp.setCurrent();
-    chrome.storage.local.set({'warnings': temp.options});
+    chrome.storage.local.set({'warnings': temp.getAllOptions()});
     chrome.runtime.getBackgroundPage(function (monitor) {
-      monitor.setOptions(temp.options);
+      monitor.setOptions(temp.getAllOptions());
       console.log("Options saved.");
       $save.prop('disabled', true);
     });
@@ -131,7 +137,6 @@ $(function() {
 
       var areSame =
         current.enabled === saved.enabled &&
-        current.trigger === saved.trigger &&
         current.trigger.timeAmount === saved.trigger.timeAmount &&
         current.trigger.timeUnit === saved.trigger.timeUnit &&
         current.trigger.percent === saved.trigger.percent;

@@ -61,16 +61,14 @@ var Trigger = function(_percent, _timeAmount, _timeUnit) {
 
 Trigger.prototype.check = function(battery) {
   if (this.percent !== null) {
-    if(this.percent === Math.ceil(battery.level * 100) ||
-       this.percent === Math.floor(battery.level * 100)) {
-         return true;
+    if(this.percent > Math.ceil(battery.level * 100)) {
+      return true;
     }
   }
 
   if (this.time() !== null) {
-    if (this.time() === battery.chargingTime ||
-        this.time() === battery.dischargingTime) {
-          return true;
+    if (this.time() > battery.dischargingTime) {
+      return true;
     }
   }
 
@@ -98,34 +96,10 @@ function Warning(options) {
   options = options || {};
 
   this.enabled = ('enabled' in options) ? options.enabled : true;
-  this.trigger = ('trigger' in options) ? options.trigger : new Trigger(10);
+  this.trigger = ('trigger' in options) ? options.trigger : new Trigger(5);
 
   this.shown = false;
 }
-
-Warning.prototype.notificationId = "battery-warning";
-
-Warning.prototype.name = function() {
-  var percentText, timeText;
-
-  if (this.trigger.percent !== null) {
-    percentText = this.trigger.percent + "%";
-  }
-
-  if (this.trigger.time() !== null) {
-    timeText = formatTime(this.trigger.time());
-  }
-
-  if (percentText && timeText) {
-    return "Warning: " + percentText + ", " + timeText;
-  }
-  else if (percentText) {
-    return "Warning: " + percentText;
-  }
-  else if (timeText) {
-    return "Warning: " + timeText;
-  }
-};
 
 Warning.prototype.checkBattery = function(battery) {
 
@@ -140,15 +114,11 @@ Warning.prototype.checkBattery = function(battery) {
   this.shown = isTriggered;
 };
 
-Warning.prototype.updateNotificationId = function(newId) {
-  Warning.prototype.notificationId = newId;
-};
-
 Warning.prototype.showNotification = function(battery) {
   var percentage = Math.floor(battery.level * 100);
 
   chrome.notifications.create(
-    this.notificationId,
+    "battery-notifier",
     {
       type: "basic",
       title: percentage + "% power left",
@@ -157,7 +127,7 @@ Warning.prototype.showNotification = function(battery) {
       isClickable: false,
       iconUrl: "assets/icon_128.png"
     },
-    this.updateNotificationId
+    function () {}
   );
 };
 
@@ -209,8 +179,7 @@ navigator.getBattery().then(function(battery){
   loadFromStorage();
 
   battery.addEventListener('levelchange', function() {
-    var battery = this;
-    warnings.forEach(function(warning) {
+    warnings.forEach(function (warning) {
       warning.checkBattery(battery);
     });
   });

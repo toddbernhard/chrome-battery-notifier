@@ -1,0 +1,9 @@
+﻿This small extension provides 3 configurable battery notifications. They can be triggered by either
+- percent of battery left, or
+- estimated time left.
+
+
+Chrome OS does not allow users to change the default notification, which seems to show at 1% power remaining.
+
+
+Bug reports, feature requests, contributions -- all are welcome on GitHub!
