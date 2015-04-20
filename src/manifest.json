@@ -8,7 +8,7 @@
 
   "background": {
     "persistent": false,
-    "scripts": ["jquery-2.1.3.min.js","monitor.js"]
+    "page": "background.html"
   },
   "icons": {
     "16": "assets/icon_16.png",
