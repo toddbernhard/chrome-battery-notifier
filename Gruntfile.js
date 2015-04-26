@@ -15,17 +15,7 @@ module.exports = function(grunt) {
     },
     karma: {
       unit: {
-        autoWatch: false,
-        browsers: ['PhantomJS'],
-        frameworks: ['jasmine'],
-        singleRun: true,
-        files: [{
-          src: 'test/**/*.js'
-        }, {
-          src: 'src/lib/*.js'
-        }, {
-          src: 'src/monitor.js'
-        }]
+        configFile: 'karma.conf.js',
       }
     }
   });

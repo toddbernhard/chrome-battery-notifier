@@ -1,5 +1,5 @@
 #### Chrome Battery Notifier
-Chrome OS (at least version 41) does not allow users to change the built-in defaults, which seem to be 1%. This is a small Chrome extension which provides 3 configurable battery notifications.  They can be triggered by either
+Chrome OS (up to v.42) does not allow users to change the built-in default of 15 minutes. This is a small Chrome extension which provides 3 configurable battery notifications.  They can be triggered by either
 - percent of battery power remaining, or
 - estimated time left
 

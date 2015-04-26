@@ -1,4 +1,4 @@
-function init(chrome, navigator) {
+require(['jquery', 'chrome', 'navigator'], function($, chrome, navigator) {
   /**
    * Time to text conversions
    */
@@ -184,4 +184,4 @@ function init(chrome, navigator) {
   }, function() {
     console.log("no battery found");
   });
-}
+});
