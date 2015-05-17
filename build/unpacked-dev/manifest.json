@@ -1,0 +1,28 @@
+{
+    "manifest_version": 2,
+    "name": "Battery Notifier",
+    "short_name": "Battery Notifier",
+    "minimum_chrome_version": "38",
+    "background": {
+        "persistent": false,
+        "scripts": [
+            "js/background.js"
+        ]
+    },
+    "icons": {
+        "16": "images/icon_16.png",
+        "48": "images/icon_48.png",
+        "128": "images/icon_128.png"
+    },
+    "permissions": [
+        "notifications",
+        "storage"
+    ],
+    "options_page": "html/options.html",
+    "options_ui": {
+        "page": "html/options.html",
+        "chrome_style": true
+    },
+    "version": "0.2.0",
+    "description": "A small, configurable low battery notifier"
+}

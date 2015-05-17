@@ -1,4 +1,4 @@
-$(function() {
+var $ = require('./libs/jquery');
 
   var $select = $('select.main'),
       $allOptions = $('div.table'),
@@ -20,27 +20,29 @@ $(function() {
     }
   };
 
-  var temp = {
-        options: [defaultOptions, defaultOptions, defaultOptions],
-        index: 0,
-        getOptions: function(index) {
+  var temp = {options: []};
+  //temp.options = [];
+  temp.index = 0;
+  temp.getOptions = function(index) {
           index = index || temp.index;
-          if (index < temp.options.length) {
+          if (temp.options && index < temp.options.length) {
             return temp.options[index];
           } else {
             return defaultOptions;
           }
-        },
-        getAllOptions: function() {
+        };
+  temp.getAllOptions = function() {
           return [temp.getOptions(0), temp.getOptions(1), temp.getOptions(2)];
-        },
-        set: function(options) {
+        };
+  temp.set = function(options) {
           temp.options = options;
-        },
-        setCurrent: function() {
-          temp.options[temp.index] = currentInput();
-        }
-      };
+        };
+  temp.setCurrent = function() {
+    if (typeof(temp.options) === "undefined") {
+      temp.options = [];
+    };
+    temp.options[temp.index] = currentInput();
+  };
 
   function loadOptions() {
     var options;
@@ -80,7 +82,7 @@ $(function() {
   function changeSelect() {
     temp.setCurrent();
     $allOptions.fadeOut(150, function() {
-      temp.index = $select.val();
+      temp.index = parseInt($select.val());
       updateDom(temp.getOptions());
       $allOptions.fadeIn(400);
     });
@@ -162,4 +164,3 @@ $(function() {
   $allOptions.on('click', updateSaveButton);
 
   loadOptions();
-});

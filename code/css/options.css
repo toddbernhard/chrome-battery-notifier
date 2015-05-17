@@ -1,0 +1,80 @@
+body {
+  padding: .5em;
+  font-size: 16px;
+  height: 340px;
+}
+
+h3 {
+  margin-top: 0.5em;
+  margin-bottom: 1.9em;
+  text-align: center;
+}
+
+div.table {
+  width: 380px;
+}
+
+div.row {
+  width: 100%;
+  margin-bottom: .4em;
+}
+
+div.row.multirow {
+  margin-bottom: 0;
+}
+
+span.label {
+  display: inline-block;
+  width: 50%;
+  text-align: right;
+  padding-right: .8em;
+}
+
+span.option {
+  display: inline-block;
+  font-size: .95em;
+}
+
+input[type="radio"] {
+  margin-right: .8em;
+}
+
+input[type="number"] {
+  width: 3.5em;
+}
+
+.hide {
+  display: none;
+}
+
+.disabled {
+  opacity: 0.3;
+}
+
+.center {
+  text-align: center;
+}
+
+#save {
+  margin: auto;
+  margin-top: 2.5em;
+}
+
+.git-link {
+  display: block;
+  float: right;
+  margin-top: 1em;
+  text-decoration: none;
+  opacity: 0.45;
+  color: #000;
+  font-size: .8em;
+}
+.git-link:hover {
+  opacity: 1;
+}
+
+.git-link img {
+  margin-bottom: -.6em;
+  margin-left: .4em;
+  height: 1.8em;
+}

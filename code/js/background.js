@@ -1,4 +1,6 @@
-require(['jquery', 'chrome', 'navigator'], function($, chrome, navigator) {
+;(function() {
+  var $ = require('./libs/jquery');
+
   /**
    * Time to text conversions
    */
@@ -184,4 +186,5 @@ require(['jquery', 'chrome', 'navigator'], function($, chrome, navigator) {
   }, function() {
     console.log("no battery found");
   });
-});
+
+})();

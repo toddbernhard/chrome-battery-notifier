@@ -1,0 +1,54 @@
+<html>
+<head>
+  <title>Battery Warning settings</title>
+  <link rel="stylesheet" type="text/css" href="../css/options.css">
+</head>
+<body>
+  <div>
+    <h3>
+    <select class="main">
+      <option value="0">notification #1</option>
+      <option value="1">notification #2</option>
+      <option value="2">notification #3</option>
+    </select>
+    </h3>
+    <div class="table">
+      <div class="row">
+        <span class="label">Enabled:</span>
+        <span class="option"><input type="checkbox" name="enabled" checked></span>
+      </div>
+      <div class="all-but-enabled">
+        <div class="row multirow">
+          <span class="label">Based on</span>
+          <span class="option"><input type="radio" name="type" value="percent" checked>Percent left</span>
+        </div>
+        <div class="row">
+          <span class="label"></span>
+          <span class="option"><input type="radio" name="type" value="time">Time left</span>
+        </div>
+        <div class="row percent-arg">
+          <span class="label">Show at</span>
+          <span class="option"><input type="number" name="percentArg" min="0" max="100" stepsize="1" value="5" size="3"> %</span>
+        </div>
+        <div class="row time-arg hide">
+          <span class="label">Show at</span>
+          <span class="option">
+            <input type="number" name="timeArgAmount" min="1" max="1000" stepsize="1" value="10" size="4">
+            <select name="timeArgUnit">
+              <option value="seconds">seconds</option>
+              <option value="minutes" selected>minutes</option>
+              <option value="hours">hours</option>
+            </select>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="row center"><button id="save" disabled>Save</button></div>
+    <a class="git-link" href="http://github.com/toddbernhard/chrome-battery-warning">
+      <span>GitHub </span>
+      <img src="../images/github_32.png">
+    </a>
+  </div>
+  <script src="../js/options.js"></script>
+</body>
+</html>
